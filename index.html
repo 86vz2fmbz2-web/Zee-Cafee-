@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZEE Chocolate | تشوكلت وقهوة مختصة - تعنايل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            --primary: #3d2612; /* لون شوكولا غامق راقي */
+            --accent: #c6925e; /* لون ذهبي دافئ */
+            --dark: #121212;
+            --light: #fbf7f2;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* خلفية الـ 3D التفاعلية (Canvas) */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* الهيدر الفخم */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(251, 247, 242, 0.85);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 6%;
+            z-index: 1000;
+            transition: 0.4s ease;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            margin-right: 25px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        .insta-btn {
+            background: var(--primary);
+            color: white;
+            padding: 10px 22px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(61, 38, 18, 0.2);
+        }
+
+        .insta-btn:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* الواجهة الرئيسية مع تأثيرات بصرية */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(20, 12, 6, 0.7), rgba(61, 38, 18, 0.7)), url('https://images.unsplash.com/photo-1541167760496-1628856ab772?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 52px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s 0.3s forwards cubic-bezier(0.16, 1, 0.3, 1);
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 20px;
+            max-width: 650px;
+            margin-bottom: 35px;
+            color: #f1e4d8;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s 0.5s forwards cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-menu {
+            background: var(--accent);
+            color: white;
+            padding: 14px 35px;
+            border-radius: 35px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+            box-shadow: 0 6px 20px rgba(198, 146, 94, 0.4);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s 0.7s forwards cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-menu:hover {
+            background: #b07d4b;
+            transform: translateY(-4px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* الأقسام العامة مع حركة Scroll Reveal */
+        section {
+            padding: 90px 8%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 38px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            width: 70px;
+            height: 4px;
+            background: var(--accent);
+            display: block;
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        /* تصميم الكاردات بزجاج فخم (Glassmorphism) وبحركات تفاعلية */
+        .grid-2-col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 35px;
+        }
+
+        .menu-category {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(198, 146, 94, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .menu-category.reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .menu-category:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(61, 38, 18, 0.08);
+            border-color: var(--accent);
+        }
+
+        .menu-category h3 {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 22px;
+            border-bottom: 2px solid rgba(198, 146, 94, 0.15);
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-items-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.08);
+            transition: 0.3s;
+        }
+
+        .menu-item:hover {
+            padding-right: 8px;
+            background: rgba(198, 146, 94, 0.04);
+            border-radius: 8px;
+        }
+
+        .item-info h4 {
+            font-size: 17px;
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        .item-info p {
+            font-size: 13px;
+            color: #777;
+        }
+
+        .item-price {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 16px;
+            background: rgba(198, 146, 94, 0.1);
+            padding: 5px 12px;
+            border-radius: 12px;
+        }
+
+        /* قسم التواصل بفخامة */
+        .contact {
+            background: linear-gradient(135deg, #3d2612, #5a3a1b);
+            color: white;
+            text-align: center;
+            border-radius: 25px;
+            margin: 50px 8%;
+            padding: 60px 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .contact h2 {
+            color: white !important;
+        }
+
+        .contact p {
+            font-size: 19px;
+            color: #e5d3c0;
+            margin-bottom: 25px;
+        }
+
+        .contact .insta-btn {
+            background: var(--accent);
+            display: inline-flex;
+            margin: 0 auto;
+        }
+
+        .contact .insta-btn:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        footer {
+            background: #1a1008;
+            color: #aaa;
+            text-align: center;
+            padding: 25px;
+            font-size: 14px;
+            position: relative;
+            z-index: 2;
+        }
+
+        @media(max-width: 768px) {
+            nav { display: none; }
+            .hero h1 { font-size: 34px; }
+            .grid-2-col { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <header id="header">
+        <div class="logo"><i class="fa-solid fa-mug-hot" style="color: var(--accent);"></i> ZEE Chocolate</div>
+        <nav>
+            <a href="#home">الرئيسية</a>
+            <a href="#about">من نحن</a>
+            <a href="#menu">القائمة</a>
+            <a href="#contact">المكان والتواصل</a>
+        </nav>
+        <a href="https://www.instagram.com/zee_chocolate.lb?igsi=dzZleDYwczVwNWUx" target="_blank" class="insta-btn">
+            <i class="fa-brands fa-instagram"></i> انستغرام
+        </a>
+    </header>
+
+    <section id="home" class="hero">
+        <h1>تجربة الشوكولا والقهوة الاستثنائية</h1>
+        <p>اكتشف عالم الفخامة والأجواء الهادئة والساحرة في ZEE Chocolate - تعنايل.</p>
+        <a href="#menu" class="btn-menu">تصفح القائمة الساحرة</a>
+    </section>
+
+    <section id="about" style="text-align: center; max-width: 850px; margin: 0 auto;">
+        <h2 class="section-title">عن ZEE Chocolate</h2>
+        <p style="font-size: 20px; color: #555; line-height: 1.9; font-weight: 600;">
+            أول قهوة مختصة وأفضل وجهة لمحبي القهوة والحلويات الفاخرة في تعنايل والبقاع. نصنع لك لحظات دافئة ومليئة بألذ المذاقات.
+        </p>
+    </section>
+
+    <section id="menu">
+        <h2 class="section-title">قائمة الطعام والمشروبات الفاخرة</h2>
+        
+        <div class="grid-2-col">
+            
+            <div class="menu-category">
+                <h3><i class="fa-solid fa-cookie-bite" style="color: var(--accent);"></i> الحلويات (Sweets)</h3>
+                <div class="menu-items-grid">
+                    <div class="menu-item"><div class="item-info"><h4>Muffins</h4><p>Blueberry, Vanilla, Chocolate</p></div><div class="item-price">2.00 $</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Donuts</h4></div><div class="item-price">2.00 $</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Lazy Cake</h4></div><div class="item-price">3.00 $</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Tiramisu</h4></div><div class="item-price">4.00 $</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Red Velvet Cake</h4></div><div class="item-price">4.00 $</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Strawberry Cheesecake</h4></div><div class="item-price">4.00 $</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Cinnamon Rolls</h4></div><div class="item-price">4.00 $</div></div>
+                </div>
+            </div>
+
+            <div class="menu-category">
+                <h3><i class="fa-solid fa-coffee" style="color: var(--accent);"></i> القهوة الكلاسيكية (Coffee)</h3>
+                <div class="menu-items-grid">
+                    <div class="menu-item"><div class="item-info"><h4>Expresso Single</h4></div><div class="item-price">200,000 L.L</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Expresso Double</h4></div><div class="item-price">300,000 L.L</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Americano</h4></div><div class="item-price">300,000 L.L</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Rakwe Small</h4></div><div class="item-price">350,000 L.L</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Rakwe Large</h4></div><div class="item-price">500,000 L.L</div></div>
+                </div>
+            </div>
+
+            <div class="menu-category">
+                <h3><i class="fa-solid fa-mug-saucer" style="color: var(--accent);"></i> القهوة المختصة (Speciality)</h3>
+                <div class="menu-items-grid">
+                    <div class="menu-item"><div class="item-info"><h4>French Press</h4></div><div class="item-price">360,000 L.L</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Chemex</h4></div><div class="item-price">450,000 L.L</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>V60 <span style="font-size:11px; color:#999;">(Ask for single origin)</span></h4></div><div class="item-price">450,000 L.L</div></div>
+                </div>
+            </div>
+
+            <div class="menu-category">
+                <h3><i class="fa-solid fa-leaf" style="color: var(--accent);"></i> خالي من السكر وماتشا</h3>
+                <div class="menu-items-grid">
+                    <div class="menu-item"><div class="item-info"><h4>Vanilla / Caramel Latte (Sugar Free)</h4></div><div class="item-price">400,000 L.L</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Matcha Vanilla</h4></div><div class="item-price">400,000 L.L</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Vanilla Matcha</h4></div><div class="item-price">500k - 550k</div></div>
+                </div>
+            </div>
+
+            <div class="menu-category">
+                <h3><i class="fa-solid fa-mug-hot" style="color: var(--accent);"></i> المشروبات الساخنة (Hot Latte)</h3>
+                <div class="menu-items-grid">
+                    <div class="menu-item"><div class="item-info"><h4>Cafe / Caramel / Vanilla / Spanish Latte</h4></div><div class="item-price">400,000 L.L</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Chocolate Mocha / White Mocha</h4></div><div class="item-price">400,000 L.L</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Lotus / Hazelnut / Cinnamon Latte</h4></div><div class="item-price">400,000 L.L</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Hot Chocolate / Tiramisu</h4></div><div class="item-price">400,000 L.L</div></div>
+                </div>
+            </div>
+
+            <div class="menu-category">
+                <h3><i class="fa-solid fa-glass-water" style="color: var(--accent);"></i> المشروبات الباردة والمثلجة</h3>
+                <div class="menu-items-grid">
+                    <div class="menu-item"><div class="item-info"><h4>Iced Tea (Lemon / Peach / Berry)</h4></div><div class="item-price">450k - 550k</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Iced Latte / Macchiato</h4></div><div class="item-price">450k - 550k</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Shakes (Oreo, Kinder, Dubai Chocolate)</h4></div><div class="item-price">450k - 650k</div></div>
+                    <div class="menu-item"><div class="item-info"><h4>Mojito & Zee Special Pink Drink</h4></div><div class="item-price">450k - 550k</div></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <h2 class="section-title" style="color: white !important;">زورونا في تعنايل</h2>
+        <p><i class="fa-solid fa-location-dot"></i> الموقع: تعنايل، البقاع (أفضل جو هادئ وجميل بانتظاركم)</p>
+        <a href="https://www.instagram.com/zee_chocolate.lb?igsi=dzZleDYwczVwNWUx" target="_blank" class="insta-btn">
+            <i class="fa-brands fa-instagram"></i> تابعونا على إنستغرام
+        </a>
+    </section>
+
+    <footer>
+        <p>جميع الحقوق محفوظة &copy; 2026 ZEE Chocolate</p>
+    </footer>
+
+    <script>
+        // تأثير ظهور الأقسام تدريجياً مع الاسكرول (Scroll Reveal)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.menu-category').forEach((el) => {
+            observer.observe(el);
+        });
+
+        // تأثير تغيير الهيدر عند النزول
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.style.padding = '12px 6%';
+                header.style.background = 'rgba(251, 247, 242, 0.95)';
+            } else {
+                header.style.padding = '18px 6%';
+                header.style.background = 'rgba(251, 247, 242, 0.85)';
+            }
+        });
+
+        // رسم كرات شوكولا وقهوة 3D خفيفة تتفاعل مع الماوس بالخلفية (Canvas 3D Effect)
+        const canvasContainer = document.getElementById('canvas-container');
+        const canvas = document.createElement('canvas');
+        canvasContainer.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // إنشاء جزيئات شوكولا وقهوة عائمة
+        const particles = [];
+        const numParticles = 25;
+        const mouse = { x: null, y: null };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        for (let i = 0; i < numParticles; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                radius: Math.random() * 8 + 3,
+                color: Math.random() > 0.5 ? '#3d2612' : '#c6925e',
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                density: (Math.random() * 20) + 10
+            });
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+                if (p.y < 0) p.y = height;
+                if (p.y > height) p.y = 0;
+
+                // تفاعل خفيف جداً مع الماوس لتأثير 3D حقيقي
+                if (mouse.x && mouse.y) {
+                    let dx = mouse.x - p.x;
+                    let dy = mouse.y - p.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 100) {
+                        p.x -= dx / p.density;
+                        p.y -= dy / p.density;
+                    }
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = 0.25;
+                ctx.fill();
+                ctx.closePath();
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+
+        animateParticles();
+    </script>
+</body>
+</html>
